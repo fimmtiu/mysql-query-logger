@@ -5,6 +5,9 @@ import (
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -25,21 +28,42 @@ func main() {
 
 	packetSource := gopacket.NewPacketSource(pcapHandle, pcapHandle.LinkType())
 	packetSource.DecodeOptions = gopacket.NoCopy
+	packetChan := packetSource.Packets()
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 
-	for packet := range packetSource.Packets() {
-		app := packet.ApplicationLayer()
-		if app == nil {
-			continue
-		}
-		payload := app.Payload()
-		if payload == nil {
-			continue
-		}
-		mysqlPacket := ReadMysqlPacket(payload)
-		if mysqlPacket == nil {
-			continue
-		}
+Loop:
+	for {
+		select {
+		case packet := <-packetChan:
+			app := packet.ApplicationLayer()
+			if app == nil {
+				continue
+			}
+			payload := app.Payload()
+			if payload == nil {
+				continue
+			}
+			mysqlPacket := ReadMysqlPacket(payload)
+			if mysqlPacket == nil {
+				continue
+			}
+			conf.LogFile.Printf("%s;\n", mysqlPacket.Statement)
 
-		conf.LogFile.Printf("%s;\n", mysqlPacket.Statement)
+		case <-signalChan:
+			break Loop
+		}
+	}
+
+	printStatistics(pcapHandle)
+}
+
+func printStatistics(handle *pcap.Handle) {
+	stats, err := handle.Stats()
+	if err == nil {
+		fmt.Fprintf(os.Stderr, "\nPackets received: %28d\nPackets dropped by kernel: %19d\nPackets dropped by interface: %16d\n",
+			stats.PacketsReceived, stats.PacketsDropped, stats.PacketsIfDropped)
+	} else {
+		fmt.Fprintf(os.Stderr, "Couldn't read packet statistics: %s", err)
 	}
 }
