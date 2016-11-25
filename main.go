@@ -19,7 +19,7 @@ func main() {
 	filter := fmt.Sprintf("dst host %s and tcp port %d", conf.MysqlHost, conf.MysqlPort)
 	err = pcapHandle.SetBPFFilter(filter)
 	if err != nil {
-		log.Fatalf("Can't filter network interface: %s", err)
+		log.Fatalf("Can't apply pcap filter (%s): %s", filter, err)
 	}
 
 	packetSource := gopacket.NewPacketSource(pcapHandle, pcapHandle.LinkType())
