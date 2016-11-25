@@ -22,3 +22,6 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+# Don't accidentally check in the binary!
+mysql-query-logger
