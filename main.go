@@ -12,14 +12,14 @@ func main() {
 
 	pcapHandle, err := pcap.OpenLive(conf.Interface, 1600, true, pcap.BlockForever)
 	if err != nil {
-		log.Fatalf("Can't open network interface: %s", err)
+		log.Fatalf("Can't open network interface %s: %s", conf.Interface, err)
 	}
 
 	// TODO: Allow for monitoring multiple MySQL servers.
 	filter := fmt.Sprintf("dst host %s and tcp port %d", conf.MysqlHost, conf.MysqlPort)
 	err = pcapHandle.SetBPFFilter(filter)
 	if err != nil {
-		log.Fatalf("Can't filter network interface: %s", err)
+		log.Fatalf("Can't apply pcap filter (%s): %s", filter, err)
 	}
 
 	packetSource := gopacket.NewPacketSource(pcapHandle, pcapHandle.LinkType())
