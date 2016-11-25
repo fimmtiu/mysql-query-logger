@@ -31,7 +31,7 @@ func GetConfig() Config {
 	case 0:
 		conf.LogFile = makeLogger(os.Stdout)
 	case 1:
-		file, err := os.OpenFile(flag.Arg(0), os.O_WRONLY|os.O_CREATE, 0666)
+		file, err := os.OpenFile(flag.Arg(0), os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
 			log.Fatalf("Can't open %s: %s", flag.Arg(0), err)
 		}
