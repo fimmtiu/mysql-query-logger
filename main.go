@@ -12,7 +12,7 @@ func main() {
 
 	pcapHandle, err := pcap.OpenLive(conf.Interface, 1600, true, pcap.BlockForever)
 	if err != nil {
-		log.Fatalf("Can't open network interface: %s", err)
+		log.Fatalf("Can't open network interface %s: %s", conf.Interface, err)
 	}
 
 	// TODO: Allow for monitoring multiple MySQL servers.
