@@ -9,12 +9,14 @@ and picking out the packets that look like queries.
 ## Usage
 
 ```
-mysql-query-logger [-h host] [-p port] [-i interface] [logfile]
+mysql-query-logger [-h host] [-p port] [-i interface] [-l log-level] [logfile]
 ```
 
 _host_ and _port_ are the host and port that your MySQL server is accepting
 connections on. _interface_ is the local network interface. If no _logfile_
-is supplied, this program logs to standard output.
+is supplied, this program logs to standard output. _log-level_ is an
+integer from 0 to 3 which specifies how much debugging output to print; the
+default is 0. (You are unlikely to ever need this.)
 
 For obvious reasons, this program needs to be run on a machine in the same
 subnet as the MySQL server; if it's a switched network, you'll have to
